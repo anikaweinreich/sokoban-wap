@@ -68,19 +68,18 @@ const LevelParser = () => {
   if (loading) return <p>Loading levels...</p>;
   if (error) return <p>Error: {error}</p>;
 
-  return (
+  return null;
+  /*return (
     <div>
       <h1>Sokoban Levels</h1>
       {levels.map((level, index) => (
         <div key={index}>
           <h2>Title: {level.title}</h2>
-          {/* concatenating all the elements of the array in new line each */}
           <pre>{level.design.join('\n')}</pre>
-          {/* <p><strong>Comment:</strong> {level.comment}</p> */}
-        </div>
+          </div>
       ))}
     </div>
-  );
+  );*/
 };
 
 export default LevelParser;
