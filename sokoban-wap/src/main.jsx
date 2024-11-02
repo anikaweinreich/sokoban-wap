@@ -8,8 +8,12 @@ import Game from './components/Game.jsx'
 import './index.css'
 import NotFound from './components/NotFound.jsx'
 import { AuthProvider } from './components/AuthContext.jsx'
+import { useAuth } from './components/AuthContext.jsx'
 
-const isLoggedIn = () => localStorage.getItem('isLoggedIn') === "true";
+//nur in Komponenten können Hooks (useAuth) verwendet werden -> daher main.jsx Logik in Komponente wrappen.
+function AuthWrapper() {
+  const { isLoggedIn } = useAuth();
+
 
 //Routes Definition - Angabe Pfade und zugehörige Komponenten
 //Navigate to (replace -> to not return to previous route from before being redirected)
@@ -20,7 +24,7 @@ const router = createBrowserRouter([
     children: [
       {path: "/login", element:<Login />},
       {path: "/signup", element:<Signup />},
-      { path: "/game", element: isLoggedIn() ? <Game /> : <Navigate to="/login" replace /> },
+      {path: "/game", element: isLoggedIn ? <Game /> : <Navigate to="/login" replace /> },
     ]
   },
   /*
@@ -37,12 +41,15 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
   }*/
 ]);
+//Router
+return <RouterProvider router={router} />;
+}
 
 //RouterProvider rendert entsprechende Komponente bei Änderung der URL
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <AuthWrapper /> 
     </AuthProvider>
   </StrictMode>,
 )
