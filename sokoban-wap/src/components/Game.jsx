@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import ExtractLevels from './ExtractLevels2';
+import ExtractLevels from './ExtractLevels';
 
 const Game = () => {
   const [levels, setLevels] = useState([]);
+  const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
+
+  const goToNextLevel = () => {
+    // Increment the level index
+    if (currentLevelIndex < levels.length - 1) {
+      setCurrentLevelIndex(currentLevelIndex + 1);
+    }
+  };
 
   return (
     <div>
@@ -10,8 +18,10 @@ const Game = () => {
       <ExtractLevels setLevels={setLevels} />
       {levels.length > 0 && (
         <div>
-          <h2>Title: {levels[1].title}</h2>
-          <pre>{levels[1].design.join('\n')}</pre>
+          <h2>Level: {levels[currentLevelIndex].title}</h2>
+          <pre>{levels[currentLevelIndex].design.join('\n')}</pre>
+          {/* Button to go to the next level (for testing) */}
+          <button onClick={goToNextLevel}>Next Level</button>
         </div>
       )}
     </div>
