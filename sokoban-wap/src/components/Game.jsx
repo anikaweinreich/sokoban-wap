@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ExtractLevels from './ExtractLevels';
+import GameLogic from "./GameLogic.jsx";
 
 const Game = () => {
   const [levels, setLevels] = useState([]);
@@ -19,7 +20,8 @@ const Game = () => {
       {levels.length > 0 && (
         <div>
           <h2>Level: {levels[currentLevelIndex].title}</h2>
-          <pre>{levels[currentLevelIndex].design.join('\n')}</pre>
+          {/*<pre>{levels[currentLevelIndex].design.join('\n')}</pre>*/}
+          <GameLogic levels={levels} currentLevelIndex={currentLevelIndex}/>
           {/* Button to go to the next level (for testing) */}
           <button onClick={goToNextLevel}>Next Level</button>
         </div>
