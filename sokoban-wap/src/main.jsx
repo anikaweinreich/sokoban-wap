@@ -5,6 +5,7 @@ import App from './App.jsx'
 import Login from './components/Login.jsx'
 import Signup from './components/Signup.jsx'
 import Game from './components/Game.jsx'
+import Highscore from './components/Highscore.jsx'
 import './index.css'
 import NotFound from './components/NotFound.jsx'
 import { AuthProvider } from './components/AuthContext.jsx'
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       {path: "/login", element:<Login />},
       {path: "/signup", element:<Signup />},
       {path: "/game", element: isLoggedIn ? <Game /> : <Navigate to="/login" replace /> },
+      {path: "/highscore", element: isLoggedIn ? <Highscore /> : <Navigate to="/login" replace /> },
     ]
   },
   /*
