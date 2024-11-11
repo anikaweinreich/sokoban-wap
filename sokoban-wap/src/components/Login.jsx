@@ -16,17 +16,18 @@ function Login() {
     const navigate = useNavigate();
 
     //login event handler
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         if(!username || !password) {
             setError("Please fill out all fields!");
             return; 
         } 
 
+        /* local storage
         const users = JSON.parse(localStorage.getItem("users")) || [];
         //check if username and password are correct
         const user = users.find(u => u.username === username && u.password === password);
-
+        
         if(user) {
             login();
             //navigate to game component
@@ -34,7 +35,32 @@ function Login() {
         } else {
             setMessage("Incorrect username or password.");
             setError("");
-        }
+        }*/
+
+        try {
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({"name": username, "password": password})
+            });
+
+            const data = await response.json();
+
+            if(!response.ok) {
+                //wenn man error Objekt zurückbekommt wird es ausgegeben, sonst 'Login failed'
+                throw new Error(data.error || 'Login failed')
+            }
+
+            login();
+            //navigate to game component
+            navigate("/game");
+            
+        } catch (e) {
+            setMessage("Incorrect username or password.");
+            setError("");
+        }     
     };
 
     return(
