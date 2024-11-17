@@ -11,6 +11,20 @@ app.use(cors({
     methods: 'POST,GET,PUT,DELETE',   // Allowed HTTP methods
     credentials: true,                // Allow cookies if needed
 }));
+//Logging middleware for all HTTP methods
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
+
+//Mock Authorization Middleware
+const mockAuthorization = (req, res, next) => {
+    const authHeader = req.headers["authorization"];
+    if(!authHeader || authHeader !== "Bearer mock-token") {
+        return res.status(403).json({error: "Unauthorized"});
+    }
+    next(); 
+};
 
 //backend port
 const port = 3000;
@@ -24,7 +38,7 @@ let highscores = [];
 app.get('/', (req, res) => {
     res.send('Hello World')
 });
-//login route 
+//login route  
 app.post('/login', (req, res) => {
     const name = req.body.name;
     const password = req.body.password;
@@ -59,15 +73,15 @@ app.post('/signup', (req, res) => {
     users.push({name, password});
     return res.status(201).json({message: 'user created successfully'});
 });
-//highscore routes
+//highscore routes (Authorization required -> use middleware)
 //get highscore from database
-app.get('/highscore', (req, res) => {
+app.get('/highscore', mockAuthorization, (req, res) => {
     //highscores sortieren
     const sortedHighscores = [...highscores].sort((a,b) => b.score - a.score);
     res.status(200).json(sortedHighscores); 
 });
 //add highscore to database
-app.post('/highscore/add', (req, res) => {
+app.post('/highscore/add', mockAuthorization, (req, res) => {
     //username und highscore aus dem Request body nehmen
     const {name, score} = req.body;
 
@@ -84,6 +98,20 @@ app.post('/highscore/add', (req, res) => {
 //start server
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
+});
+
+//serve static files
+//app.use('/static', express.static('public')); //levels.txt zugängig unter http://localhost:3000/static/levels.txt
+
+// Define __dirname for ES modules
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Serve the React app's static files from the "dist" directory
+app.use(express.static(path.join(__dirname, "dist")));
+
+// Fallback middleware for React Router
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 
