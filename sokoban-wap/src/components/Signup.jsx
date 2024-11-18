@@ -13,7 +13,7 @@ function Signup() {
     const navigate = useNavigate(); 
 
     //prevent default form submission behavior
-    const handleSignup = (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault(); 
         //check if all fields are filled out
         if(!username || !password) {
@@ -21,6 +21,7 @@ function Signup() {
             return;
         }
 
+        /* localstorage: 
         //create json array in localstorage for users if it does not exist already (if users is null). Get users array if exists (not null).
         //string from localstorage with JSON.parse to JSON object/array
         const users = JSON.parse(localStorage.getItem("users")) || [];
@@ -36,7 +37,32 @@ function Signup() {
             setMessage("Signup successful. Redirecting to login page...");
             //navigate to login page after timeout/delay of 2 seconds
             setTimeout(() => navigate("/login"), 2000);
-        }
+        }*/
+
+            try {
+                const response = await fetch('http://localhost:3000/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({"name": username, "password": password})
+                });
+    
+                const data = await response.json();
+    
+                if(!response.ok) {
+                    //wenn man error Objekt zurückbekommt wird es ausgegeben, sonst 'Signup failed'
+                    throw new Error(data.error || 'Signup failed')
+                }
+    
+                setMessage("Signup successful. Redirecting to login page...");
+                //navigate to login page after timeout/delay of 2 seconds
+                setTimeout(() => navigate("/login"), 2000);
+                
+            } catch (e) {
+                setMessage("User already exists. Please log in or try another username.");
+            } 
+
         setError("");
     };
 

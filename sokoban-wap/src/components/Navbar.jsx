@@ -17,8 +17,10 @@ function Navbar() {
             {isLoggedIn ? (
                 <>
                     <Link to="/game" style={{ margin: '0 10px' }}>Game</Link>
+                    <Link to="/highscore" style={{ margin: '0 10px' }}>High Scores</Link>
                     <span style={{ margin: '0 10px' }}>You are logged in!</span>
                     <button onClick={handleLogout}>Logout</button>
+
                 </>
             ) : (
                 <>
