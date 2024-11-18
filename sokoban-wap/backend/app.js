@@ -4,6 +4,7 @@ import path from "path";
 import { MongoClient } from 'mongodb';
 import { fileURLToPath } from "url";
 import 'dotenv/config';
+import router from './api.js';
 
 const app = express(); 
 
@@ -21,21 +22,24 @@ app.use((req, res, next) => {
     next();
 });
 
-//Mock Authorization Middleware
+/*Mock Authorization Middleware
 const mockAuthorization = (req, res, next) => {
     const authHeader = req.headers["authorization"];
     if(!authHeader || authHeader !== "Bearer mock-token") {
         return res.status(403).json({error: "Unauthorized"});
     }
     next(); 
-};
+};*/
+
+// Registriere die Routen aus api.js
+app.use('/api', router); // Damit die Routen unter '/api' verfügbar sind
 
 //backend port
 const port = 3000;
 
-//Arrays für Mockup Routen (stellen Datenbank dar)
+/*Arrays für Mockup Routen (stellen Datenbank dar)
 let users = [];
-let highscores = [];
+let highscores = [];*/
 
 // Datenbankverbindung
 try {
@@ -160,10 +164,6 @@ app.post('/highscore/add', mockAuthorization, async (req, res) => {
     }
 });
 
-//start server
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
-});
 
 //serve static files
 //app.use('/static', express.static('public')); //levels.txt zugängig unter http://localhost:3000/static/levels.txt
