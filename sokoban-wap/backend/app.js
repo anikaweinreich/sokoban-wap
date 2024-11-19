@@ -66,7 +66,7 @@ try {
 
 
 //route definitions
-
+/*
 app.get('/', (req, res) => {
     res.send('Hello World')
 });
@@ -96,7 +96,7 @@ app.post('/login', async (req, res) => {
 });
 
 // signup route
-app.post('/signup', async (req, res) => {
+/*app.post('/signup', async (req, res) => {
     const { name, password } = req.body;
     // prüfen ob alle Felder mitgeschickt wurden
     if (!name || !password) {
@@ -123,8 +123,8 @@ app.post('/signup', async (req, res) => {
         return res.status(500).send();
     }
 });
-
-
+*/
+/*
 //highscore routes (Authorization required -> use middleware)
 //get highscore from database
 app.get('/highscore', mockAuthorization, async (req, res) => {
@@ -164,7 +164,7 @@ app.post('/highscore/add', mockAuthorization, async (req, res) => {
     }
 });
 
-
+*/
 //serve static files
 //app.use('/static', express.static('public')); //levels.txt zugängig unter http://localhost:3000/static/levels.txt
 
