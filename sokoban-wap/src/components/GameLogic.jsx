@@ -7,6 +7,7 @@ import playerOnFloorImg from '../assets/flat/playerOnFloor.png';
 import playerOnTargetImg from '../assets/flat/playerOnTarget.png';
 import targetImg from '../assets/flat/target.png';
 import wallImg from '../assets/flat/wall.png';
+import username from './Login.jsx';
 
 // Hilfsfunktion zum Suchen der Spielerposition im Design-Array
 const findPlayerPosition = (design) => {
@@ -75,7 +76,7 @@ const renderCell = (cell) => {
 const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
     const [currentLevel, setCurrentLevel] = useState(levels[currentLevelIndex]);
     const [playerPosition, setPlayerPosition] = useState({ x: null, y: null });
-    const [highscore, setHighscore] = useState(1000);
+    const [highscore, setHighscore] = useState(10000);
 
     useEffect(() => {
         if (levels.length > 0) {
@@ -86,32 +87,32 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
         }
     }, [currentLevelIndex, levels]);
 
-    const handleKeyDown = (event) => {
-        const { x, y } = playerPosition;
-        let newPosition = { x, y };
-        let nextPosition = { x, y }; // Position der Kiste
+    const handleKeyDown = async (event) => {
+        const {x, y} = playerPosition;
+        let newPosition = {x, y};
+        let nextPosition = {x, y}; // Position der Kiste
 
         // Bestimme die neue Position basierend auf der Pfeiltaste
         switch (event.key) {
             case 'ArrowUp':
-                newPosition = { x, y: y - 1 };
-                nextPosition = { x, y: y - 2 }; // Position hinter der Kiste (falls Kiste vorhanden)
-                setHighscore(highscore-1);
+                newPosition = {x, y: y - 1};
+                nextPosition = {x, y: y - 2}; // Position hinter der Kiste (falls Kiste vorhanden)
+                setHighscore(highscore - 1);
                 break;
             case 'ArrowDown':
-                newPosition = { x, y: y + 1 };
-                nextPosition = { x, y: y + 2 };
-                setHighscore(highscore-1);
+                newPosition = {x, y: y + 1};
+                nextPosition = {x, y: y + 2};
+                setHighscore(highscore - 1);
                 break;
             case 'ArrowLeft':
-                newPosition = { x: x - 1, y };
-                nextPosition = { x: x - 2, y };
-                setHighscore(highscore-1);
+                newPosition = {x: x - 1, y};
+                nextPosition = {x: x - 2, y};
+                setHighscore(highscore - 1);
                 break;
             case 'ArrowRight':
-                newPosition = { x: x + 1, y };
-                nextPosition = { x: x + 2, y };
-                setHighscore(highscore-1);
+                newPosition = {x: x + 1, y};
+                nextPosition = {x: x + 2, y};
+                setHighscore(highscore - 1);
                 break;
             default:
                 return;
@@ -134,12 +135,31 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
 
                 // Aktualisiere die Position des Spielers
                 const newDesign = updateDesignWithPlayerPosition(currentLevel.design, newPosition, playerPosition);
-                setCurrentLevel((prevLevel) => ({ ...prevLevel, design: newDesign }));
+                setCurrentLevel((prevLevel) => ({...prevLevel, design: newDesign}));
                 setPlayerPosition(newPosition);
 
                 // Überprüfen, ob das Level gewonnen ist
                 if (checkWinCondition(newDesign)) {
-                    // TODO: Highscore speichern (POST request)
+                    // TODO: Highscore testen
+                    try {
+                        const response = await fetch('http://localhost:3000/highscore/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({"name": username, "highscore": highscore})
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Signup failed')
+                        }
+                    }
+                    catch (e) {
+                        console.log(e);
+                    }
+
                     onLevelComplete();
                 }
             }
@@ -147,7 +167,7 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
         // Überprüfe, ob die neue Position begehbar ist
         else if (newChar !== '#') {
             const newDesign = updateDesignWithPlayerPosition(currentLevel.design, newPosition, playerPosition);
-            setCurrentLevel((prevLevel) => ({ ...prevLevel, design: newDesign }));
+            setCurrentLevel((prevLevel) => ({...prevLevel, design: newDesign}));
             setPlayerPosition(newPosition);
         }
     };
