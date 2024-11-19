@@ -1,4 +1,12 @@
 import { useState, useEffect } from 'react';
+import boxOnFloorImg from '../assets/flat/boxOnFloor.png';
+import boxOnTargetImg from '../assets/flat/boxOnTarget.png';
+import floorImg from '../assets/flat/floor.png';
+import grassImg from '../assets/flat/grass.png';
+import playerOnFloorImg from '../assets/flat/playerOnFloor.png';
+import playerOnTargetImg from '../assets/flat/playerOnTarget.png';
+import targetImg from '../assets/flat/target.png';
+import wallImg from '../assets/flat/wall.png';
 
 // Hilfsfunktion zum Suchen der Spielerposition im Design-Array
 const findPlayerPosition = (design) => {
@@ -42,10 +50,32 @@ const updateDesignWithPlayerPosition = (design, newPosition, oldPosition) => {
     });
 };
 
+const renderCell = (cell) => {
+    switch (cell) {
+        case '@': // Spieler
+            return <img src={playerOnFloorImg} alt="Player" />;
+        case '+': // Spieler
+            return <img src={playerOnTargetImg} alt="Player" />;
+        case '$': // Kiste
+            return <img src={boxOnFloorImg} alt="Box" />;
+        case '#': // Wand
+            return <img src={wallImg} alt="Wall" />;
+        case '.': // Ziel
+            return <img src={targetImg} alt="Target" />;
+        case '-': // Boden
+            return <img src={floorImg} alt="Floor" />;
+        case '*': // Kiste auf Ziel
+            return <img src={boxOnTargetImg} alt="Box on Target" />;
+        default: // Gras als default Bild
+            return <img src={grassImg} alt="Grass" />;
+    }
+};
+
 // Verwaltung der Spiellogik und des Spielfelds
-const GameLogic = ({levels, currentLevelIndex}) => {
+const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
     const [currentLevel, setCurrentLevel] = useState(levels[currentLevelIndex]);
     const [playerPosition, setPlayerPosition] = useState({ x: null, y: null });
+    const [highscore, setHighscore] = useState(1000);
 
     useEffect(() => {
         if (levels.length > 0) {
@@ -66,18 +96,22 @@ const GameLogic = ({levels, currentLevelIndex}) => {
             case 'ArrowUp':
                 newPosition = { x, y: y - 1 };
                 nextPosition = { x, y: y - 2 }; // Position hinter der Kiste (falls Kiste vorhanden)
+                setHighscore(highscore-1);
                 break;
             case 'ArrowDown':
                 newPosition = { x, y: y + 1 };
                 nextPosition = { x, y: y + 2 };
+                setHighscore(highscore-1);
                 break;
             case 'ArrowLeft':
                 newPosition = { x: x - 1, y };
                 nextPosition = { x: x - 2, y };
+                setHighscore(highscore-1);
                 break;
             case 'ArrowRight':
                 newPosition = { x: x + 1, y };
                 nextPosition = { x: x + 2, y };
+                setHighscore(highscore-1);
                 break;
             default:
                 return;
@@ -102,6 +136,12 @@ const GameLogic = ({levels, currentLevelIndex}) => {
                 const newDesign = updateDesignWithPlayerPosition(currentLevel.design, newPosition, playerPosition);
                 setCurrentLevel((prevLevel) => ({ ...prevLevel, design: newDesign }));
                 setPlayerPosition(newPosition);
+
+                // Überprüfen, ob das Level gewonnen ist
+                if (checkWinCondition(newDesign)) {
+                    // TODO: Highscore speichern (POST request)
+                    onLevelComplete();
+                }
             }
         }
         // Überprüfe, ob die neue Position begehbar ist
@@ -109,11 +149,6 @@ const GameLogic = ({levels, currentLevelIndex}) => {
             const newDesign = updateDesignWithPlayerPosition(currentLevel.design, newPosition, playerPosition);
             setCurrentLevel((prevLevel) => ({ ...prevLevel, design: newDesign }));
             setPlayerPosition(newPosition);
-
-            // Überprüfen, ob das Level gewonnen ist
-            if (checkWinCondition(newDesign)) {
-                alert('Level ' + (currentLevelIndex + 1) + ' gewonnen!');
-            }
         }
     };
 
@@ -125,7 +160,23 @@ const GameLogic = ({levels, currentLevelIndex}) => {
     }, [currentLevel, playerPosition]);
 
     if (!currentLevel) return <div>Lädt...</div>;
-    return <pre>{currentLevel.design.join('\n')}</pre>;
+    // Spiel mit Zeichen (nicht zentriert)
+    //return <pre>{currentLevel.design.join('\n')}</pre>;
+    // Spiel mit Bildern (zentriert)
+    return (
+        <div>
+            {currentLevel.design.map((row, rowIndex) => (
+                <div key={rowIndex} style={{ display: 'flex' }}>
+                    {row.split('').map((cell, cellIndex) => (
+                        <div key={`${rowIndex}-${cellIndex}`} style={{ width: '16px', height: '16px' }}>
+                            {renderCell(cell)}
+                        </div>
+                    ))}
+                </div>
+            ))}
+            <p>Current Score: {highscore}</p>
+        </div>
+    );
 };
 
 export default GameLogic;
