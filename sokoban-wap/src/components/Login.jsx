@@ -37,13 +37,13 @@ function Login() {
             setError("");
         }*/
 
-        try {
-            const response = await fetch('http://localhost:3000/login', {
-                method: 'POST',
+         try {
+            const response = await fetch("http://localhost:3000/api/login", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({"name": username, "password": password})
+                body: JSON.stringify({ name: username, password: password }), // Ensure correct payload
             });
 
             const data = await response.json();
