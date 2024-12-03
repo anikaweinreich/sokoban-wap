@@ -3,69 +3,56 @@ import {React, useState} from "react";
 import { useNavigate } from "react-router-dom";
 
 function Signup() {
-    //state variables
+    // State-Variablen
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
-    //navigate function
-    const navigate = useNavigate(); 
+    // Navigation
+    const navigate = useNavigate();
 
-    //prevent default form submission behavior
+    // Event-Handler für Signup
     const handleSignup = async (e) => {
-        e.preventDefault(); 
-        //check if all fields are filled out
-        if(!username || !password) {
+        e.preventDefault();
+
+        // Validierung: Felder dürfen nicht leer sein
+        if (!username || !password) {
             setError("Please fill out all fields!");
             return;
         }
 
-        /* localstorage: 
-        //create json array in localstorage for users if it does not exist already (if users is null). Get users array if exists (not null).
-        //string from localstorage with JSON.parse to JSON object/array
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        //see if username exists in localstorage already
-        const userExists = users.some(user => user.username === username);
+        try {
+            // Anfrage an Backend
+            const response = await fetch("http://localhost:3000/api/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name: username, password: password }),
+            });
 
-        if(userExists) {
-            setMessage("User already exists. Please log in or try another username.");
-        } else {
-            //add username and password to users array in localstorage
-            users.push({username, password});
-            localStorage.setItem("users", JSON.stringify(users));
+            // Antwort vom Server überprüfen
+            const text = await response.text(); // Text lesen
+            console.log("Server response:", text); // Debugging: Rohdaten anzeigen
+
+            // Versuch, die Antwort zu parsen
+            const data = JSON.parse(text);
+
+            if (!response.ok) {
+                // Wenn ein Fehler auftritt, wird eine Exception geworfen
+                throw new Error(data.error || "Signup failed");
+            }
+
+            // Erfolg: Weiterleitung zur Login-Seite
             setMessage("Signup successful. Redirecting to login page...");
-            //navigate to login page after timeout/delay of 2 seconds
             setTimeout(() => navigate("/login"), 2000);
-        }*/
-
-            try {
-                const response = await fetch('http://localhost:3000/signup', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({"name": username, "password": password})
-                });
-    
-                const data = await response.json();
-    
-                if(!response.ok) {
-                    //wenn man error Objekt zurückbekommt wird es ausgegeben, sonst 'Signup failed'
-                    throw new Error(data.error || 'Signup failed')
-                }
-    
-                setMessage("Signup successful. Redirecting to login page...");
-                //navigate to login page after timeout/delay of 2 seconds
-                setTimeout(() => navigate("/login"), 2000);
-                
-            } catch (e) {
-                setMessage("User already exists. Please log in or try another username.");
-            } 
-
-        setError("");
+        } catch (err) {
+            // Fehler behandeln
+            console.error("Signup error:", err);
+            setError(err.message || "An unexpected error occurred.");
+        }
     };
-
 
     //JSX 
     //display error message, if not all fields are filled out (error is not null)
