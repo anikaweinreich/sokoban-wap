@@ -7,7 +7,7 @@ function Highscore() {
   // fetch highscores from backend
   const fetchHighscores = async () => {
     try {
-      const response = await fetch('http://localhost:3000/highscore');
+      const response = await fetch('/api//highscore');
       
       if (!response.ok) {
         throw new Error('Failed to fetch high scores');

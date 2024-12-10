@@ -38,7 +38,7 @@ function Login() {
         }*/
 
          try {
-            const response = await fetch("http://localhost:3000/api/login", {
+            const response = await fetch("/api/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -52,6 +52,9 @@ function Login() {
                 //wenn man error Objekt zurückbekommt wird es ausgegeben, sonst 'Login failed'
                 throw new Error(data.error || 'Login failed')
             }
+
+            // Save the username to localStorage
+            localStorage.setItem("username", username);
 
             login();
             //navigate to game component

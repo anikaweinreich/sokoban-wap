@@ -7,7 +7,8 @@ import playerOnFloorImg from '../assets/flat/playerOnFloor.png';
 import playerOnTargetImg from '../assets/flat/playerOnTarget.png';
 import targetImg from '../assets/flat/target.png';
 import wallImg from '../assets/flat/wall.png';
-import username from './Login.jsx';
+
+const username = localStorage.getItem('username');
 
 // Hilfsfunktion zum Suchen der Spielerposition im Design-Array
 const findPlayerPosition = (design) => {
@@ -142,12 +143,12 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
                 if (checkWinCondition(newDesign)) {
                     // TODO: Highscore testen
                     try {
-                        const response = await fetch('http://localhost:3000/highscore/add', {
+                        const response = await fetch('/api/highscore/add', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({"name": username, "highscore": highscore})
+                            body: JSON.stringify({"name": username, "score": highscore})
                         });
 
                         const data = await response.json();
