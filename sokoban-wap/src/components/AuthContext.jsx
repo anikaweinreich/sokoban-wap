@@ -1,4 +1,5 @@
 import React, {createContext, useContext, useState} from "react";
+import PropTypes from "prop-types";
 
 //create context for authentication state (isLoggedIn) and login/logout callback functions
 const AuthContext = createContext();
@@ -24,6 +25,10 @@ export const AuthProvider = ({children}) => {
             {children}
         </AuthContext.Provider>
     )
+}
+
+AuthProvider.propTypes = {
+    children: PropTypes.node,
 }
 
 //custom hook to use authentication context

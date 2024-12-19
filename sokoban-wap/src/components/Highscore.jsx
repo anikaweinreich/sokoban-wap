@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 function Highscore() {
   const [highscores, setHighscores] = useState([]);
@@ -16,7 +16,7 @@ function Highscore() {
       const data = await response.json(); // Parse response to JSON
       setHighscores(data); // Fill the state with values from the database
     } catch (e) {
-      setError("Failed to load high scores");
+      setError("Failed to load high scores\n" + e);
     }
   };
 

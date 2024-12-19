@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import PropTypes from "prop-types";
 
 const ExtractLevels = ({ setLevels }) => {
     useEffect(() => {
@@ -47,5 +48,9 @@ const ExtractLevels = ({ setLevels }) => {
 
     return null; // This component does not render anything itself
 };
+
+ExtractLevels.propTypes = {
+    setLevels: PropTypes.func.isRequired,
+}
 
 export default ExtractLevels;
