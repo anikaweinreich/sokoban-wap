@@ -7,7 +7,13 @@ function Highscore() {
   // fetch highscores from backend
   const fetchHighscores = async () => {
     try {
-      const response = await fetch('/api//highscore');
+      const accessToken = localStorage.getItem('accessToken'); // Retrieve token from storage
+        const response = await fetch('/api/highscore', {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
       
       if (!response.ok) {
         throw new Error('Failed to fetch high scores');

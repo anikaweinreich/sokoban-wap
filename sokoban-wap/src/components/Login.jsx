@@ -61,7 +61,7 @@ function Login() {
             navigate("/game");
             
         } catch (e) {
-            setMessage("Incorrect username or password.");
+            console.error(e);
             setError("");
         }     
     };

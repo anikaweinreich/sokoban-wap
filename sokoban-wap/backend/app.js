@@ -1,70 +1,56 @@
-// entry point for Express application
-
 import express from "express";
 import cors from "cors";
-import path from "path";
-import { MongoClient } from 'mongodb';
-import { fileURLToPath } from "url";
+import { MongoClient } from "mongodb";
+import OAuthServer from "express-oauth-server";
 import 'dotenv/config';
-import router from './api.js';
+import createApiRoutes from './api.js';
+import oAuthModel from './oAuthModel.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const app = express(); 
 
-//middleware zur Ürpfung, on JSON im request Objekt gesendet wird
-app.use(express.json()); 
-// Use CORS middleware
-app.use(cors({
-    origin: 'http://localhost:5173', // Frontend origin
-    methods: ['POST', 'GET', 'PUT', 'DELETE'],   // Allowed HTTP methods
-    credentials: true,                // Allow cookies if needed
-}));
-//Logging middleware for all HTTP methods
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    next();
-});
-
-/*Mock Authorization Middleware
-const mockAuthorization = (req, res, next) => {
-    const authHeader = req.headers["authorization"];
-    if(!authHeader || authHeader !== "Bearer mock-token") {
-        return res.status(403).json({error: "Unauthorized"});
-    }
-    next(); 
-};*/
-
-// Registriere die Routen aus api.js
-app.use('/api', router); // Damit die Routen unter '/api' verfügbar sind
-
-//backend port
+const app = express();
 const port = 3000;
 
-/*Arrays für Mockup Routen (stellen Datenbank dar)
-let users = [];
-let highscores = [];*/
+// Middleware
+app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['POST', 'GET', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 
-// Datenbankverbindung
-try {
+(async () => {
+  try {
     const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING);
     await client.connect();
-    
-    const db = client.db(); 
+    const db = client.db();
 
-    // Save db references für beide Collections
-    const usersCollection = db.collection('users');
-    const highscoresCollection = db.collection('highscores');
-  
-    app.set('db', db); 
-    app.set('usersCollection', usersCollection); 
-    app.set('highscoresCollection', highscoresCollection); 
-    
-    app.listen(port, () => {
-        console.log(`Example app listening on port ${port}`);
+    app.set('db', db);
+    app.set('usersCollection', db.collection('users'));
+    app.set('highscoresCollection', db.collection('highscores'));
+
+    // Create OAuthServer instance
+    const oauth = new OAuthServer({
+      model: oAuthModel(db),
     });
-} catch (err) {
-    console.error(err);
-}
 
+    // OAuth token endpoint
+    app.post('/api/token', oauth.token({
+      requireClientAuthentication: { password: false, refresh_token: false },
+    }));
+
+    // Protected API routes
+    app.use('/api', createApiRoutes(oauth));
+
+    // Start server
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error("Error connecting to database:", err);
+  }
+})();
 
 
 //route definitions
