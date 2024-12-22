@@ -36,7 +36,6 @@ export default function oAuthModel(db) {
         // Return null if the token is missing or expired
         return null;
     },
-
     
     // Get refresh token from the database by its value
     async getRefreshToken(refreshToken) {
@@ -73,7 +72,7 @@ export default function oAuthModel(db) {
 
       return {
         ...token,
-        client,  // Attach the hardcoded client
+        client, 
         user,
       };
     },

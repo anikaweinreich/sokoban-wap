@@ -143,26 +143,29 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
                 if (checkWinCondition(newDesign)) {
                     // TODO: Highscore testen
                     try {
+                        const accessToken = localStorage.getItem('accessToken'); // Retrieve the token
+                
                         const response = await fetch('/api/highscore/add', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${accessToken}`, // Add the token here
                             },
-                            body: JSON.stringify({"name": username, "score": highscore})
+                            body: JSON.stringify({ "name": username, "score": highscore }),
                         });
-
+                
                         const data = await response.json();
-
+                
                         if (!response.ok) {
-                            throw new Error(data.error || 'Signup failed')
+                            throw new Error(data.error || 'Highscore submission failed');
                         }
-                    }
-                    catch (e) {
+                    } catch (e) {
                         console.log(e);
                     }
-
+                
                     onLevelComplete();
                 }
+                
             }
         }
         // Überprüfe, ob die neue Position begehbar ist

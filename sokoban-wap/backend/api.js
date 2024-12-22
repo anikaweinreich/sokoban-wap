@@ -124,7 +124,6 @@ router.post('/login', async (req, res) => {
 });
 
 
-
 // Signup Route
 router.post('/signup', async (req, res) => {
   const { name, password } = req.body;
@@ -163,7 +162,6 @@ router.get('/highscore', oauth.authenticate(), async (req, res) => {
       res.status(500).send();
   }
 });
-
 
 router.post('/highscore/add',  oauth.authenticate(), async (req, res) => {
   const { name, score } = req.body;
