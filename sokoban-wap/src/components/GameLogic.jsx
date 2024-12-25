@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import boxOnFloorImg from '../assets/flat/boxOnFloor.png';
 import boxOnTargetImg from '../assets/flat/boxOnTarget.png';
 import floorImg from '../assets/flat/floor.png';
@@ -8,6 +8,7 @@ import playerOnTargetImg from '../assets/flat/playerOnTarget.png';
 import targetImg from '../assets/flat/target.png';
 import wallImg from '../assets/flat/wall.png';
 import username from './Login.jsx';
+import PropTypes from "prop-types";
 
 // Hilfsfunktion zum Suchen der Spielerposition im Design-Array
 const findPlayerPosition = (design) => {
@@ -198,5 +199,11 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
         </div>
     );
 };
+
+GameLogic.propTypes = {
+    levels: PropTypes.node,
+    currentLevelIndex: PropTypes.number,
+    onLevelComplete: PropTypes.func.isRequired
+}
 
 export default GameLogic;

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
 const LevelParser = () => {
-  const [levels, setLevels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -53,13 +52,10 @@ const LevelParser = () => {
           }
          
       }
-
-     // Final check to add the last level
-    if (currentLevel.design.length > 0) {
-        levels.push(currentLevel); 
-    }
-
-    setLevels(levels);
+      // Final check to add the last level
+      if (currentLevel.design.length > 0) {
+          levels.push(currentLevel);
+      }
     };
 
     fetchFile();
@@ -69,17 +65,6 @@ const LevelParser = () => {
   if (error) return <p>Error: {error}</p>;
 
   return null;
-  /*return (
-    <div>
-      <h1>Sokoban Levels</h1>
-      {levels.map((level, index) => (
-        <div key={index}>
-          <h2>Title: {level.title}</h2>
-          <pre>{level.design.join('\n')}</pre>
-          </div>
-      ))}
-    </div>
-  );*/
 };
 
 export default LevelParser;
