@@ -10,79 +10,67 @@ register.post('/', async (req, res) => {
 
   try {
     const usersCollection = req.app.get('usersCollection');
-    const { name, password, oauthProvider, oauthToken } = req.body;
+    const { name, password } = req.body;
     const db = req.app.get('db');
 
-    // Fall 1: OAuth-Basierte Registrierung
-    if (oauthProvider && oauthToken) {
-      console.log(`Processing OAuth Signup with ${oauthProvider}`);
-      
-      // Überprüfen, ob der Benutzer bereits existiert
-      const existingUser = await usersCollection.findOne({ name });
-      if (existingUser) {
-        return res.status(409).json({ error: 'User already exists' });
-      }
-
-      // Benutzer direkt ohne Passwort speichern (OAuth-Token wird nicht gespeichert)
-      const oauthUserInsertion = await usersCollection.insertOne({
-        name,
-        oauthProvider,
-        isActive: true, // OAuth-Benutzer sind direkt aktiv
-        createdAt: new Date(),
-      });
-
-      if (!oauthUserInsertion.acknowledged) {
-        return res.status(500).json({ error: 'Failed to create user via OAuth.' });
-      }
-
-      return res.status(201).json({ message: 'OAuth Signup successful.' });
+    // Input-Validierung
+    if (!password || !name) {
+      return res.status(400).json({ error: 'Username, and password are required.' });
     }
 
-    // Fall 2: Standardregistrierung mit Name und Passwort
-    if (!name || !password) {
-      return res.status(400).json({ error: 'Username and password are required.' });
-    }
-
-    // Überprüfen, ob der Benutzer bereits existiert
     const existingUser = await usersCollection.findOne({ name });
+  
     if (existingUser) {
       return res.status(409).json({ error: 'User already exists' });
     }
+  
 
     // Passwort verschlüsseln
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Benutzer in der 'users' Collection speichern
-    const userInsertion = await usersCollection.insertOne({
-      name,
+    // Benutzer in der 'user_auth' Collection speichern (nur für Authentifizierung)
+    const userAuthInsertion = await db.collection('user_auth').insertOne({
       password: hashedPassword,
-      isActive: false, // Standardmäßig nicht aktiv
+      isActive: false,
+    });
+    
+    const userInsertion = await usersCollection.insertOne({
+      user_id: userAuthInsertion.insertedId,  // Verwende die erzeugte ID korrekt
+      name,
+      isActive: false,
       createdAt: new Date(),
     });
+    
+
+    if (!userAuthInsertion.acknowledged) {
+      return res.status(500).json({ error: 'Failed to create user in user_auth.' });
+    }
 
     if (!userInsertion.acknowledged) {
-      return res.status(500).json({ error: 'Failed to create user.' });
+      return res.status(500).json({ error: 'Failed to create user in users.' });
     }
 
     // Aktivierungs-Token erstellen
     const emailToken = uuidv4();
     const tokenInsertion = await db.collection('tokens').insertOne({
       emailToken,
-      emailTokenExpiresAt: new Date(Date.now() + 60 * 60 * 1000), // Token läuft in 1 Stunde ab
-      user_id: userInsertion.insertedId, // Verweis auf den Benutzer
+      emailTokenExpiresAt: new Date(Date.now() + 60 * 60 * 1000),  // Token läuft in 1 Stunde ab
+      user_id: userAuthInsertion.insertedId,  // Verweis auf die user_auth Collection
     });
 
     if (!tokenInsertion.acknowledged) {
-      // Token-Fehler, Benutzer löschen
-      await usersCollection.deleteOne({ _id: userInsertion.insertedId });
+      // Token-Fehler, also Benutzer in user_auth und users löschen
+      await db.collection('user_auth').deleteOne({ _id: userAuthInsertion.insertedId });
+      await usersCollection.deleteOne({ user_id: userAuthInsertion.insertedId });
       return res.status(500).json({ error: 'Failed to generate activation token.' });
     }
 
-    // Aktivierungslink (zum Testen in der Konsole ausgeben)
+    // Aktivierungslink (für den Test in der Konsole ausgeben)
     console.log(`Activation link: http://localhost:3000/activate/${emailToken}`);
 
     res.status(201).json({
       message: 'User registered successfully. Please activate your account.',
+      userId: userAuthInsertion.insertedId,
     });
   } catch (err) {
     console.error('Error during registration:', err);
@@ -107,7 +95,7 @@ register.put('/activate/:token', async (req, res) => {
     }
 
     // Benutzer aktivieren
-    const userUpdate = await usersCollection.updateOne(
+    const userUpdate = await db.collection('user_auth').updateOne(
       { _id: token.user_id },
       { $set: { isActive: true } }
     );
@@ -115,6 +103,12 @@ register.put('/activate/:token', async (req, res) => {
     if (userUpdate.modifiedCount === 0) {
       return res.status(500).json({ error: 'Failed to activate user.' });
     }
+
+    // Benutzer in der 'users' Collection aktualisieren
+    await usersCollection.updateOne(
+      { user_id: token.user_id },
+      { $set: { isActive: true } }
+    );
 
     // Token löschen
     await db.collection('tokens').deleteOne({ emailToken: req.params.token });
