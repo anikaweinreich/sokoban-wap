@@ -1,11 +1,15 @@
 import express from 'express';
 import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
+import register from './register.js';  // Importiere die Register-Logik
+
+
 
 const createApiRoutes = (oauth) => {
   const router = express.Router();
-
 // User Routes -> protected with OAuth middleware
+
+router.use('/signup', register);
 router.get('/user', oauth.authenticate(), async (req, res) => {
   try {
     const usersCollection = req.app.get('usersCollection'); // Verwendet die Collection aus app.js
@@ -125,7 +129,7 @@ router.post('/login', async (req, res) => {
 
 
 // Signup Route
-router.post('/signup', async (req, res) => {
+/*router.post('/signup', async (req, res) => {
   const { name, password } = req.body;
 
   if (!name || !password) {
@@ -148,7 +152,9 @@ router.post('/signup', async (req, res) => {
     console.error(err);
     return res.status(500).send();
   }
-});
+});*/
+
+//router.use('/signup', register); 
 
 // Highscore Routes
 router.get('/highscore', oauth.authenticate(), async (req, res) => {

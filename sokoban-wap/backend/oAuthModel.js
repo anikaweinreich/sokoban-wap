@@ -1,4 +1,3 @@
-
 // oAuthModel.js
 export default function oAuthModel(db) {
   // Hardcoded client details
@@ -22,7 +21,7 @@ export default function oAuthModel(db) {
         if (token && new Date(token.accessTokenExpiresAt) > new Date()) {
             try {
                 // Fetch the associated user and attach it to the token
-                const user = await db.collection('users').findOne({ _id: token.user_id });
+                const user = await db.collection('users').findOne({ _id: new ObjectId(token.user_id) }); // Ensure ObjectId
                 token.client = client; // Assuming 'client' is globally accessible or passed in
                 token.user = user;
 
