@@ -20,10 +20,12 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.urlencoded({ extended: false })); // in OAuth2 standard, credentials are sent as "application/x-www-form-urlencoded", this middleware allows parsing it
+app.use((req, res, next) => {
+    console.log(req.method, req.path);
+    next();
+})
 
-
-(async () => {
-  try {
+try {
     //const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING);
     const client = new MongoClient('mongodb://localhost:27017');
     await client.connect();
@@ -31,11 +33,12 @@ app.use(express.urlencoded({ extended: false })); // in OAuth2 standard, credent
 
     app.set('db', db);
     //app.set('usersCollection', db.collection('users'));
-    //app.set('highscoresCollection', db.collection('highscores'));
+    app.set('highscoresCollection', db.collection('highscores'));
 
     //we add TTL indexes to expiration fields to automaticolly remove expired entries
     db.collection('token').createIndex({accessTokenExpiresAt: 1}, { expireAfterSeconds: 0 });
     db.collection('token').createIndex({refreshTokenExpiresAt: 1}, { expireAfterSeconds: 0 });
+    // registration token
     db.collection('token').createIndex({emailTokenExpiresAt: 1}, { expireAfterSeconds: 0 });
 
     // Create OAuthServer instance
@@ -44,16 +47,15 @@ app.use(express.urlencoded({ extended: false })); // in OAuth2 standard, credent
     // backend routes
     app.use('/api/token', oauth.token({requireClientAuthentication: { password: false, refresh_token: false }})); // use oauth token middleware
     app.use('/api/register', register);         // handle user registration
-    app.use('/api', oauth.authenticate(), api); // use auth authentication middleware on any resource that should be protected
+    app.use('/api', oauth.authenticate(), api(oauth)); // use auth authentication middleware on any resource that should be protected
 
     // start server
     app.listen(port, () => {
         console.log(`Server running at http://localhost/:${port}`);
     });
-  } catch (err) {
+} catch (err) {
     console.error("Error connecting to database:", err);
-  }
-})();
+}
 
 
 

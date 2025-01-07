@@ -70,7 +70,6 @@ function Highscore() {
           return await retryResponse.json();
         }
     
-      
       if (!response.ok) {
         throw new Error('Failed to fetch high scores');
       }
