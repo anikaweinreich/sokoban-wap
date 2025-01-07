@@ -37,29 +37,42 @@ function Login() {
             setError("");
         }*/
 
-         try {
-            const response = await fetch("http://localhost:3000/api/login", {
+        try {
+            const response = await fetch("/api/token", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: JSON.stringify({ name: username, password: password }), // Ensure correct payload
+                body: new URLSearchParams({
+                    username,
+                    password,
+                    grant_type: "password",
+                    client_id: "sokoban",
+                }).toString(),
             });
-
-            const data = await response.json();
 
             if(!response.ok) {
                 //wenn man error Objekt zurückbekommt wird es ausgegeben, sonst 'Login failed'
-                throw new Error(data.error || 'Login failed')
+                throw new Error("Invalid username or password");
             }
+
+            const data = await response.json();
+
+            
+            // Save tokens to local storage
+            localStorage.setItem("accessToken", data.access_token);
+            localStorage.setItem("refreshToken", data.refresh_token);
+            
+            // Save the username to localStorage
+            localStorage.setItem("username", username);
 
             login();
             //navigate to game component
             navigate("/game");
             
         } catch (e) {
-            setMessage("Incorrect username or password.\n" + e);
-            setError("");
+            console.error(e);
+            setError(e.message || "An error occurred. Please try again.");
         }     
     };
 

@@ -7,8 +7,38 @@ import playerOnFloorImg from '../assets/flat/playerOnFloor.png';
 import playerOnTargetImg from '../assets/flat/playerOnTarget.png';
 import targetImg from '../assets/flat/target.png';
 import wallImg from '../assets/flat/wall.png';
-import username from './Login.jsx';
-import PropTypes from "prop-types";
+
+// Function to refresh the access token
+const refreshAccessToken = async (refreshToken) => {
+    try {
+      const response = await fetch("/api/token/refresh", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          refresh_token: refreshToken,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to refresh access token. Please log in again.");
+      }
+
+      const data = await response.json();
+
+      // Update tokens in localStorage
+      localStorage.setItem("accessToken", data.access_token);
+      localStorage.setItem("refreshToken", data.refresh_token);
+
+      return data.access_token;
+    } catch (err) {
+      console.error("Token refresh error:", err.message);
+      throw err;
+    }
+  };
+
+const username = localStorage.getItem('username');
 
 // Hilfsfunktion zum Suchen der Spielerposition im Design-Array
 const findPlayerPosition = (design) => {
@@ -22,7 +52,7 @@ const findPlayerPosition = (design) => {
 // Funktion, um herauszufinden, ob alle Kisten an deren Platz sind
 const checkWinCondition = (design) => {
     for (let row of design) {
-        if (row.includes('.')) {
+        if (row.includes('.') || row.includes('+')) {
             return false;
         }
     }
@@ -143,26 +173,48 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
                 if (checkWinCondition(newDesign)) {
                     // TODO: Highscore testen
                     try {
-                        const response = await fetch('http://localhost:3000/highscore/add', {
+                        const accessToken = localStorage.getItem('accessToken'); // Retrieve the token
+                
+                        const response = await fetch('/api/highscore/add', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${accessToken}`, // Add the token here
                             },
-                            body: JSON.stringify({"name": username, "highscore": highscore})
+                            body: JSON.stringify({ "name": username, "score": highscore }),
                         });
 
+                        if (response.status === 401) {
+                            // If unauthorized, try refreshing the token
+                            const newAccessToken = await refreshAccessToken(refreshToken);
+                      
+                            // Retry the original request with the new access token
+                            const retryResponse = await fetch('/api/highscore', {
+                              method: 'GET',
+                              headers: {
+                                  Authorization: `Bearer ${newAccessToken}`,
+                              },
+                            });
+                      
+                            if (!retryResponse.ok) {
+                              throw new Error(`Request failed with status ${retryResponse.status}`);
+                            }
+                      
+                            return await retryResponse.json();
+                          }
+                
                         const data = await response.json();
-
+                
                         if (!response.ok) {
-                            throw new Error(data.error || 'Signup failed')
+                            throw new Error(data.error || 'Highscore submission failed');
                         }
-                    }
-                    catch (e) {
+                    } catch (e) {
                         console.log(e);
                     }
-
+                
                     onLevelComplete();
                 }
+                
             }
         }
         // Überprüfe, ob die neue Position begehbar ist

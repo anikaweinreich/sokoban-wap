@@ -5,48 +5,45 @@ import { useNavigate } from "react-router-dom";
 function Signup() {
     // State-Variablen
     const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
 
     // Navigation
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
 
     // Event-Handler für Signup
     const handleSignup = async (e) => {
         e.preventDefault();
 
         // Validierung: Felder dürfen nicht leer sein
-        if (!username || !password) {
+        if (!username || !email) {
             setError("Please fill out all fields!");
             return;
         }
 
         try {
             // Anfrage an Backend
-            const response = await fetch("http://localhost:3000/api/signup", {
+            const response = await fetch("/api/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ name: username, password: password }),
+                body: JSON.stringify({ username: username, email: email }),
             });
 
-            // Antwort vom Server überprüfen
-            const text = await response.text(); // Text lesen
-            console.log("Server response:", text); // Debugging: Rohdaten anzeigen
+            // // Antwort vom Server überprüfen
+            // const text = await response.text(); // Text lesen
+            // console.log("Server response:", text); // Debugging: Rohdaten anzeigen
 
-            // Versuch, die Antwort zu parsen
-            const data = JSON.parse(text);
+            // // Versuch, die Antwort zu parsen
+            // const data = JSON.parse(text);
 
             if (!response.ok) {
-                // Wenn ein Fehler auftritt, wird eine Exception geworfen
-                throw new Error(data.error || "Signup failed");
+                throw new Error("Signup failed");
             }
 
-            // Erfolg: Weiterleitung zur Login-Seite
-            setMessage("Signup successful. Redirecting to login page...");
-            setTimeout(() => navigate("/login"), 2000);
+            setMessage("Signup successful. Please check your email for the activation link.");
         } catch (err) {
             // Fehler behandeln
             console.error("Signup error:", err);
@@ -61,7 +58,7 @@ function Signup() {
         <h1>Signup</h1>
         <form onSubmit={handleSignup}>
             <input type="text" id="username" name="username" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)}/>
-            <input type="password" id="password" name="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+            <input type="text" id="email" name="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)}/>
             <button type="submit">Signup</button>
         </form>
         {error && <p style={{color:"red"}}>{error}</p>}

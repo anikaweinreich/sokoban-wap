@@ -6,6 +6,7 @@ import Login from './components/Login.jsx'
 import Signup from './components/Signup.jsx'
 import Game from './components/Game.jsx'
 import Highscore from './components/Highscore.jsx'
+import Activate from './components/Activate.jsx'
 import './index.css'
 import NotFound from './components/NotFound.jsx'
 import { AuthProvider } from './components/AuthContext.jsx'
@@ -25,6 +26,8 @@ const router = createBrowserRouter([
     children: [
       {path: "/login", element:<Login />},
       {path: "/signup", element:<Signup />},
+      // activate route mit token als URL Parameter
+      {path: "/activate/:token", element:<Activate />},
       {path: "/game", element: isLoggedIn ? <Game /> : <Navigate to="/login" replace /> },
       {path: "/highscore", element: isLoggedIn ? <Highscore /> : <Navigate to="/login" replace /> },
     ]
