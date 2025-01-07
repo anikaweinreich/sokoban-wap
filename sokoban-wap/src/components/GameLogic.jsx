@@ -52,7 +52,7 @@ const findPlayerPosition = (design) => {
 // Funktion, um herauszufinden, ob alle Kisten an deren Platz sind
 const checkWinCondition = (design) => {
     for (let row of design) {
-        if (row.includes('.')) {
+        if (row.includes('.') || row.includes('+')) {
             return false;
         }
     }
