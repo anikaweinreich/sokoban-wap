@@ -23,7 +23,8 @@ app.use(cors({
 
 (async () => {
   try {
-    const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING);
+    //const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING);
+    const client = new MongoClient('mongodb://localhost:27017');
     await client.connect();
     const db = client.db();
 
