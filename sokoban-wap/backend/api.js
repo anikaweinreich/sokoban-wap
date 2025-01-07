@@ -3,13 +3,28 @@ import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import register from './register.js';  // Importiere die Register-Logik
 
+async function writeAccess(req, res, next) {
+  const db = req.app.get('db');
+
+  // Retrieve user information based on token
+  const token = await db.collection('token').findOne({ accessToken: req.headers.authorization });
+  if (token) {
+      const user = await db.collection('user_auth').findOne({ _id: ObjectId(token.user_id) });
+      if (user && user.permissions.write) {
+          res.locals.user = user; // Attach user to res.locals
+          return next();
+      } else {
+          res.status(403).send();
+      }
+  }
+}
 
 
 const createApiRoutes = (oauth) => {
   const router = express.Router();
 // User Routes -> protected with OAuth middleware
 
-router.use('/signup', register);
+/*router.use('/signup', register);
 router.get('/user', oauth.authenticate(), async (req, res) => {
   try {
     const usersCollection = req.app.get('usersCollection'); // Verwendet die Collection aus app.js
@@ -157,7 +172,7 @@ router.post('/login', async (req, res) => {
 //router.use('/signup', register); 
 
 // Highscore Routes
-router.get('/highscore', oauth.authenticate(), async (req, res) => {
+router.get('/highscore', /*oauth.authenticate(),*/ async (req, res) => {
   console.log('Authenticated token:', res.locals.oauth.token); // Debugging
   try {
       const highscoresCollection = req.app.get('highscoresCollection');
@@ -169,7 +184,7 @@ router.get('/highscore', oauth.authenticate(), async (req, res) => {
   }
 });
 
-router.post('/highscore/add',  oauth.authenticate(), async (req, res) => {
+router.post('/highscore/add',  /*writeAccess, oauth.authenticate(),*/ async (req, res) => {
   const { name, score } = req.body;
 
   if (!name || score === undefined) {
