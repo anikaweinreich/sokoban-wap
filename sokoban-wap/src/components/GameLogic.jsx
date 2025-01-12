@@ -190,7 +190,7 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
                             const newAccessToken = await refreshAccessToken(refreshToken);
                       
                             // Retry the original request with the new access token
-                            const retryResponse = await fetch('/api/highscore', {
+                            const retryResponse = await fetch('/api/highscore/add', {
                               method: 'GET',
                               headers: {
                                   Authorization: `Bearer ${newAccessToken}`,
