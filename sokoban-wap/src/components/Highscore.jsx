@@ -77,6 +77,7 @@ function Highscore() {
       const data = await response.json(); // Parse response to JSON
       setHighscores(data); // Fill the state with values from the database
     } catch (e) {
+        console.log(e);
         setError("Failed to load high scores");
     }
   };

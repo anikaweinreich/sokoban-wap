@@ -172,7 +172,6 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
 
                 // Überprüfen, ob das Level gewonnen ist
                 if (checkWinCondition(newDesign)) {
-                    // TODO: Highscore testen
                     try {
                         const accessToken = localStorage.getItem('accessToken'); // Retrieve the token
                 
@@ -187,7 +186,7 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
 
                         if (response.status === 401) {
                             // If unauthorized, try refreshing the token
-                            const newAccessToken = await refreshAccessToken(refreshToken);
+                            const newAccessToken = await refreshAccessToken(/*refreshToken*/);
                       
                             // Retry the original request with the new access token
                             const retryResponse = await fetch('/api/highscore/add', {

@@ -4,8 +4,8 @@ import { MongoClient } from "mongodb";
 import AuthServer from 'express-oauth-server';
 import 'dotenv/config';
 import AuthModel from './oAuthModel.js'; // connects the AuthServer to Database
-import path from 'path';
-import { fileURLToPath } from 'url';
+//import path from 'path';
+//import { fileURLToPath } from 'url';
 import register from './register.js';
 import api from './api.js';
 
