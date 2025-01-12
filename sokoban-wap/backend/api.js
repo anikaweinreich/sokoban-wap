@@ -92,7 +92,7 @@ router.post('/login', async (req, res) => {
 
 // Highscore Routes
 router.get('/highscore', /*oauth.authenticate(),*/ async (req, res) => {
-  console.log('Authenticated token:', res.locals.oauth.token); // Debugging
+  //console.log('Authenticated token:', res.locals.oauth.token); // Debugging
   try {
       const highscoresCollection = req.app.get('highscoresCollection');
       const highscores = await highscoresCollection.find().sort({ score: -1 }).toArray();

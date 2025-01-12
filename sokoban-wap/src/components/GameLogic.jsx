@@ -7,6 +7,7 @@ import playerOnFloorImg from '../assets/flat/playerOnFloor.png';
 import playerOnTargetImg from '../assets/flat/playerOnTarget.png';
 import targetImg from '../assets/flat/target.png';
 import wallImg from '../assets/flat/wall.png';
+import PropTypes from "prop-types";
 
 // Function to refresh the access token
 const refreshAccessToken = async (refreshToken) => {
@@ -176,7 +177,7 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
                         const accessToken = localStorage.getItem('accessToken'); // Retrieve the token
                 
                         const response = await fetch('/api/highscore/add', {
-                            method: 'POST',
+                            method: 'POST', 
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${accessToken}`, // Add the token here
@@ -189,7 +190,7 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
                             const newAccessToken = await refreshAccessToken(refreshToken);
                       
                             // Retry the original request with the new access token
-                            const retryResponse = await fetch('/api/highscore', {
+                            const retryResponse = await fetch('/api/highscore/add', {
                               method: 'GET',
                               headers: {
                                   Authorization: `Bearer ${newAccessToken}`,
