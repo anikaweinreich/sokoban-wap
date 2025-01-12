@@ -7,6 +7,7 @@ import playerOnFloorImg from '../assets/flat/playerOnFloor.png';
 import playerOnTargetImg from '../assets/flat/playerOnTarget.png';
 import targetImg from '../assets/flat/target.png';
 import wallImg from '../assets/flat/wall.png';
+import PropTypes from "prop-types";
 
 // Function to refresh the access token
 const refreshAccessToken = async (refreshToken) => {
