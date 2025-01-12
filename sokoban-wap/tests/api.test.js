@@ -30,7 +30,10 @@ beforeAll(() => {
 
     // Router mit mock-oauth erstellen und registrieren
     const mockOauth = {
-        authenticate: () => (req, res, next) => next(),
+        authenticate: () => (req, res, next) => {
+            res.locals.oauth = { token: 'mock-token' }; // Mock token
+            next();
+        },
     };
     const router = createApiRoutes(mockOauth);
     app.use('/', router);
@@ -44,12 +47,12 @@ afterEach(() => {
 
 describe('GET /highscore', () => {
     it('should return an empty array when no highscores exist', async () => {
-        const response = request(app).get('/highscore');        // undefined?
+        const response = await request(app).get('/highscore'); 
         expect(response.status).toBe(200);
         expect(response.body).toEqual([]);
         expect(mockFind).toHaveBeenCalled();
     });
-
+    
     it('should return highscores sorted by score in descending order', async () => {
         // Mock-Daten vorbereiten
         mockFind.mockReturnValue({
@@ -59,24 +62,24 @@ describe('GET /highscore', () => {
                 { name: 'Alice', score: 100 },
             ]),
         });
-
-        const response = request(app).get('/highscore');
-        expect(response.status).toBe(200);      // undefined? again?
+    
+        const response = await request(app).get('/highscore'); 
+        expect(response.status).toBe(200);
         expect(response.body).toEqual([
             { name: 'Bob', score: 200 },
             { name: 'Alice', score: 100 },
         ]);
         expect(mockFind).toHaveBeenCalled(); // Sicherstellen, dass `find` aufgerufen wurde
     });
-
+    
     it('should handle errors and return status 500', async () => {
         // Fehler simulieren
         mockFind.mockImplementation(() => {
             throw new Error('Database error');
         });
-
-        const response = request(app).get('/highscore');
-        expect(response.status).toBe(500); // 500-Fehler erwarten - wieder undefinded :-(
+    
+        const response = await request(app).get('/highscore'); 
+        expect(response.status).toBe(500); // 500-Fehler erwarten
     });
 });
 

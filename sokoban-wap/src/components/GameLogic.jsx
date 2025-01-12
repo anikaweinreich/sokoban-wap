@@ -177,7 +177,7 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
                         const accessToken = localStorage.getItem('accessToken'); // Retrieve the token
                 
                         const response = await fetch('/api/highscore/add', {
-                            method: 'POST',
+                            method: 'POST', 
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${accessToken}`, // Add the token here
