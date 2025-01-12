@@ -1,0 +1,36 @@
+name: Run Unit Tests
+
+# Trigger
+on:
+  pull_request:
+    branches:
+      - '**' # All Pull Requests
+  push:
+    branches:
+      - 'feature/**'
+      - 'hotfix/**'
+      - 'release/**'
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest # (Virtuelle Maschine)
+
+    steps:
+      # Code checken
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Node.js einrichten
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Dependencies installieren
+      - name: Install dependencies
+        run: npm install
+
+      # Run Unit-Tests
+      - name: Run Unit Tests
+        run: npm test

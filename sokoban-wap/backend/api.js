@@ -1,9 +1,9 @@
 import express from 'express';
-import { ObjectId } from 'mongodb';
-import bcrypt from 'bcrypt';
-import register from './register.js';  // Importiere die Register-Logik
+//import { ObjectId } from 'mongodb';
+//import bcrypt from 'bcrypt';
+//import register from './register.js';  // Importiere die Register-Logik
 
-async function writeAccess(req, res, next) {
+/*async function writeAccess(req, res, next) {
   const db = req.app.get('db');
 
   // Retrieve user information based on token
@@ -17,10 +17,10 @@ async function writeAccess(req, res, next) {
           res.status(403).send();
       }
   }
-}
+}*/
 
 
-const createApiRoutes = (oauth) => {
+const createApiRoutes = (/*oauth*/) => {
   const router = express.Router();
 // User Routes -> protected with OAuth middleware
 
