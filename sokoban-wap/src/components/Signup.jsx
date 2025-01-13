@@ -49,7 +49,7 @@ function Signup() {
     };
 
     // Function to clear error message on user input
-    const handleInputChange = (setter, field) => (e) => {
+    const handleInputChange = (setter) => (e) => {
         if (error) setError(""); 
         setter(e.target.value);
     };

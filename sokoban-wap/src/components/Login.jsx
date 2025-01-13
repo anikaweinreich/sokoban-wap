@@ -13,7 +13,7 @@ import Paper from '@mui/material/Paper';
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [message] = useState("");
+    //const [message] = useState("");
     const [error, setError] = useState("");
 
     //login function from AuthContext
