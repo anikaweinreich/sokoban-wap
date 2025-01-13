@@ -9,6 +9,8 @@ import targetImg from '../assets/flat/target.png';
 import wallImg from '../assets/flat/wall.png';
 import PropTypes from "prop-types";
 
+
+
 // Function to refresh the access token
 const refreshAccessToken = async (refreshToken) => {
     try {
@@ -39,7 +41,7 @@ const refreshAccessToken = async (refreshToken) => {
     }
   };
 
-const username = localStorage.getItem('username');
+
 
 // Hilfsfunktion zum Suchen der Spielerposition im Design-Array
 const findPlayerPosition = (design) => {
@@ -174,6 +176,9 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
                 if (checkWinCondition(newDesign)) {
                     try {
                         const accessToken = localStorage.getItem('accessToken'); // Retrieve the token
+                        const refreshToken = localStorage.getItem("refreshToken");
+                        // get username from localstorage
+                        const username = localStorage.getItem('username');
                 
                         const response = await fetch('/api/highscore/add', {
                             method: 'POST', 
@@ -186,7 +191,7 @@ const GameLogic = ({levels, currentLevelIndex, onLevelComplete}) => {
 
                         if (response.status === 401) {
                             // If unauthorized, try refreshing the token
-                            const newAccessToken = await refreshAccessToken(/*refreshToken*/);
+                            const newAccessToken = await refreshAccessToken(refreshToken);
                       
                             // Retry the original request with the new access token
                             const retryResponse = await fetch('/api/highscore/add', {
