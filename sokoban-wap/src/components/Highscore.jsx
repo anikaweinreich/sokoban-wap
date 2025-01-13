@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { List, ListItem, ListItemText, Typography, Paper } from '@mui/material';
+
 
 function Highscore() {
   const [highscores, setHighscores] = useState([]);
@@ -92,21 +94,30 @@ function Highscore() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2>High Scores</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
+      <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#264A8A', marginBottom: 2 }}>
+        High Scores
+      </Typography>
+      {error && <Typography color="error">{error}</Typography>}
+  
       {/* High Scores List */}
-      <ul>
+      <Paper sx={{ padding: '16px', boxShadow: 3, borderRadius: 4, bgcolor: '#DAE1F1' }}>
         {highscores.length > 0 ? (
-          highscores.map((score, index) => (
-            <li key={index}>
-              {score.name}: {score.score}
-            </li>
-          ))
+          <List>
+            {highscores.map((score, index) => (
+              <ListItem key={index}>
+                <ListItemText
+                  primary={`${index + 1}. ${score.name}: ${score.score}`}
+                  sx={{ fontWeight: 'bold', fontSize: '16px' }}
+                />
+              </ListItem>
+            ))}
+          </List>
         ) : (
-          <p>No High Scores available yet.</p>
+          <Typography variant="body1" color="textSecondary">
+            No High Scores available yet.
+          </Typography>
         )}
-      </ul>
+      </Paper>
     </div>
   );
 }

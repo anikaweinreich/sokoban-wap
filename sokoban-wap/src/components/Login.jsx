@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+
 
 function Login() {
     const [username, setUsername] = useState("");
@@ -76,21 +82,49 @@ function Login() {
         }     
     };
 
-    return(
-        <>
-        <h1>Login</h1>
-        <form onSubmit={handleLogin}>
-            <input type="text" id="username" name="username" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} />
-            <input type="password" id="password" name="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button type="submit">Login</button>
-        </form>
-        {error && <p style={{color:"red"}}>{error}</p>}
-        <p>{message}</p>
-        <br />
-        <p>Not signed up yet? Sign up here </p>
-        <Link to="/signup">Signup</Link>
-        </>
+    return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+            <Paper elevation={3} sx={{ p: 4, borderRadius: 4, width: '100%', maxWidth: 360, textAlign: 'center', boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)' }}>
+                <Typography variant="h4" sx={{ color: '#77AB82', fontWeight: 700, mb: 2 }}>Login</Typography>
+                <form onSubmit={handleLogin} noValidate>
+                    <TextField 
+                        fullWidth 
+                        label="Username" 
+                        variant="outlined" 
+                        margin="normal" 
+                        value={username} 
+                        onChange={(e) => setUsername(e.target.value)} 
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} 
+                    />
+                    <TextField 
+                        fullWidth 
+                        label="Password" 
+                        variant="outlined" 
+                        type="password" 
+                        margin="normal" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} 
+                    />
+                    <Button 
+                        type="submit" 
+                        variant="contained" 
+                        fullWidth 
+                        sx={{ mt: 3, borderRadius: '15px', fontWeight: 'bold', bgcolor: '#77AB82', ':focus': {outline: 'none'}, ':hover': { bgcolor: '#589B66' } }}>
+                        Login
+                    </Button>
+                </form>
+                {error && <Typography variant="body2" color="error" sx={{ mt: 2 }}>{error}</Typography>}
+                <Typography variant="body1" sx={{ mt: 3 }}>
+                    Not signed up yet?{' '}
+                    <Link to="/signup" style={{ color: '#729ABE', textDecoration: 'none', fontWeight: 'bold' }}>
+                        Signup
+                    </Link>
+                </Typography>
+            </Paper>
+        </Box>
     );
+    
 }
 
 export default Login;

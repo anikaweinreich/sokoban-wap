@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext'; //import custom hook to use context
+import { Button } from '@mui/material';
 
 function Navbar() {
     const {isLoggedIn, logout} = useAuth();
@@ -19,7 +20,22 @@ function Navbar() {
                     <Link to="/game" style={{ margin: '0 10px' }}>Game</Link>
                     <Link to="/highscore" style={{ margin: '0 10px' }}>High Scores</Link>
                     <span style={{ margin: '0 10px' }}>You are logged in!</span>
-                    <button onClick={handleLogout}>Logout</button>
+                    <Button 
+                        onClick={handleLogout}
+                        sx={{
+                            margin: '0 10px',
+                            padding: '6px 12px',
+                            backgroundColor: '#729ABE',
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            borderRadius: '4px',
+                            '&:hover': {
+                                backgroundColor: '#487AA6',
+                            },
+                        }}
+                    >
+                        Logout
+                    </Button>
 
                 </>
             ) : (
